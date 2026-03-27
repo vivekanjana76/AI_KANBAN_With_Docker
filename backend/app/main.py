@@ -1,13 +1,54 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 import os
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from starlette.middleware.sessions import SessionMiddleware
 
+from app.ai import (
+    AIChatRequest,
+    AIChatResponse,
+    AIServiceError,
+    AITestResponse,
+    request_openrouter_structured_response,
+    request_openrouter_test_response,
+)
+from app.board import BoardPayload, BoardResponse, default_board
+from app.db import get_board, init_db, upsert_board
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
+
+def require_authenticated_username(request: Request) -> str:
+    if not request.session.get("authed"):
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    username = request.session.get("username")
+    if not isinstance(username, str) or not username:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    return username
+
+
+def load_or_create_board(username: str) -> dict:
+    board = get_board(username)
+    if board is not None:
+        return board
+
+    board = default_board()
+    upsert_board(username, board)
+    return board
+
 
 def create_app(frontend_dist: Path | None = None) -> FastAPI:
-    app = FastAPI(title="Project Management MVP API")
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        init_db()
+        yield
+
+    app = FastAPI(title="Project Management MVP API", lifespan=lifespan)
     root_dir = Path(__file__).resolve().parents[2]
     frontend_root = (frontend_dist or (root_dir / "frontend" / "out")).resolve()
 
@@ -80,6 +121,64 @@ def create_app(frontend_dist: Path | None = None) -> FastAPI:
     @app.get("/api/hello")
     def hello() -> dict[str, str]:
         return {"message": "hello world"}
+
+    @app.get("/api/board", response_model=BoardResponse)
+    def read_board(request: Request) -> BoardResponse:
+        username = require_authenticated_username(request)
+        return BoardResponse(board=BoardPayload.model_validate(load_or_create_board(username)))
+
+    @app.put("/api/board", response_model=BoardResponse)
+    def replace_board(payload: BoardPayload, request: Request) -> BoardResponse:
+        username = require_authenticated_username(request)
+        board = payload.model_dump(mode="python")
+        upsert_board(username, board)
+        return BoardResponse(board=payload)
+
+    @app.get("/api/ai/test", response_model=AITestResponse)
+    async def ai_test(request: Request, prompt: str = "2+2") -> AITestResponse:
+        require_authenticated_username(request)
+        try:
+            assistant_message = await request_openrouter_test_response(prompt)
+        except AIServiceError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+        return AITestResponse(
+            assistant_message=assistant_message,
+            model="openai/gpt-oss-120b:free",
+        )
+
+    @app.post("/api/ai/chat", response_model=AIChatResponse)
+    async def ai_chat(payload: AIChatRequest, request: Request) -> AIChatResponse:
+        username = require_authenticated_username(request)
+        if payload.board is not None:
+            current_board = payload.board.model_dump(mode="python")
+            upsert_board(username, current_board)
+        else:
+            current_board = load_or_create_board(username)
+
+        try:
+            ai_response = await request_openrouter_structured_response(
+                payload.message,
+                payload.history,
+                current_board,
+            )
+        except AIServiceError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+        next_board = (
+            ai_response.board_update.model_dump(mode="python")
+            if ai_response.board_update is not None
+            else current_board
+        )
+
+        if ai_response.board_update is not None:
+            upsert_board(username, next_board)
+
+        return AIChatResponse(
+            assistant_message=ai_response.assistant_message,
+            board=BoardPayload.model_validate(next_board),
+            board_updated=ai_response.board_update is not None,
+        )
 
     @app.get("/")
     def root(request: Request) -> Response:

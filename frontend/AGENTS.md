@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`frontend/` contains the existing Next.js Kanban MVP UI. It currently runs as a standalone client app with in-memory board state and local interactions (no backend persistence yet).
+`frontend/` contains the Next.js Kanban MVP UI. It loads and saves board state through the FastAPI backend and includes an AI chat sidebar for board-aware assistance.
 
 ## Tech Stack
 
@@ -23,11 +23,13 @@
 
 ## Implemented Behavior
 
-- Five-column Kanban board initialized from static seed data.
+- Five-column Kanban board loads from backend API on page open.
 - Column titles are editable inline.
 - Cards can be added and removed.
 - Cards can be reordered within a column and moved across columns via drag-and-drop.
-- Board state is currently in React component state only.
+- Board changes persist through backend API saves.
+- Loading, save, and error states are surfaced in the UI.
+- AI sidebar sends conversation history plus current board state to the backend and applies returned board updates immediately.
 
 ## Styling and Design Notes
 
@@ -44,8 +46,8 @@
   - `npm run test:e2e`
   - `npm run test:all`
 
-## Constraints for Upcoming Integration
+## Notes
 
-- Keep UI behavior consistent while replacing in-memory state with backend persistence.
-- Preserve existing drag-and-drop UX and component structure where practical.
-- Prefer minimal changes over broad refactors unless required by integration.
+- Playwright e2e now runs against the real FastAPI-served static build, not `next dev`.
+- The frontend stays client-rendered so the static export can call backend APIs at runtime.
+- Server-originated board updates from initial load and AI responses intentionally skip the debounced save echo.

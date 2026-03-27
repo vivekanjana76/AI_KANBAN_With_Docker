@@ -8,10 +8,10 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 - [x] Expand this plan into detailed execution steps.
 - [x] Add explicit test plan and success criteria per part.
 - [x] Create `frontend/AGENTS.md` documenting existing frontend code and conventions.
-- [ ] Keep this checklist updated as work is completed.
+- [x] Keep this checklist updated as work is completed.
 
 ### Tests
-- [ ] Manual review that all parts include actionable tasks, tests, and success criteria.
+- [x] Manual review that all parts include actionable tasks, tests, and success criteria.
 
 ### Success Criteria
 - Plan is concrete enough to execute with minimal ambiguity.
@@ -72,7 +72,7 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 ### Tests
 - [x] Unit tests for credential validation and session helpers.
 - [x] Integration tests for protected routes and redirect behavior.
-- [ ] e2e tests for successful login, failed login, and logout.
+- [x] e2e tests for successful login, failed login, and logout.
 
 ### Success Criteria
 - Unauthenticated users cannot access Kanban board.
@@ -100,18 +100,18 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 ## Part 6: Backend Kanban API
 
 ### Tasks
-- [ ] Add API routes for authenticated user board operations:
-  - [ ] Read board.
-  - [ ] Replace/update board.
-  - [ ] Optional targeted card/column operations if needed by UI.
-- [ ] Validate payload shapes with clear errors.
-- [ ] Keep API responses stable and documented.
-- [ ] Ensure DB file/tables auto-create on first run.
+- [x] Add API routes for authenticated user board operations:
+  - [x] Read board.
+  - [x] Replace/update board.
+  - [x] Optional targeted card/column operations if needed by UI.
+- [x] Validate payload shapes with clear errors.
+- [x] Keep API responses stable and documented.
+- [x] Ensure DB file/tables auto-create on first run.
 
 ### Tests
-- [ ] Backend unit tests for service and data layer logic.
-- [ ] API tests for success and failure cases.
-- [ ] Auth tests to ensure unauthorized requests are blocked.
+- [x] Backend unit tests for service and data layer logic.
+- [x] API tests for success and failure cases.
+- [x] Auth tests to ensure unauthorized requests are blocked.
 
 ### Success Criteria
 - API can reliably read and persist Kanban state.
@@ -120,15 +120,15 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 ## Part 7: Connect Frontend to Backend Persistence
 
 ### Tasks
-- [ ] Replace frontend local-only state initialization with API-backed load.
-- [ ] Persist board changes via backend API after edits/moves.
-- [ ] Handle loading, save, and error states simply and clearly.
-- [ ] Keep drag/drop and editing UX responsive.
+- [x] Replace frontend local-only state initialization with API-backed load.
+- [x] Persist board changes via backend API after edits/moves.
+- [x] Handle loading, save, and error states simply and clearly.
+- [x] Keep drag/drop and editing UX responsive.
 
 ### Tests
-- [ ] Frontend unit tests for API client/state orchestration.
-- [ ] Integration tests with mocked API responses.
-- [ ] e2e tests proving persistence across page reloads.
+- [x] Frontend unit tests for API client/state orchestration.
+- [x] Integration tests with mocked API responses.
+- [x] e2e tests proving persistence across page reloads.
 
 ### Success Criteria
 - User changes survive refresh and restart.
@@ -137,15 +137,15 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 ## Part 8: OpenRouter Connectivity
 
 ### Tasks
-- [ ] Add backend OpenRouter client using `OPENROUTER_API_KEY` from `.env`.
-- [ ] Configure model: `OpenAI: gpt-oss-120b (free)`.
-- [ ] Add simple test endpoint/service call for connectivity.
-- [ ] Implement request timeout and user-safe error handling.
+- [x] Add backend OpenRouter client using `OPENROUTER_API_KEY` from `.env`.
+- [x] Configure model: `OpenAI: gpt-oss-120b (free)`.
+- [x] Add simple test endpoint/service call for connectivity.
+- [x] Implement request timeout and user-safe error handling.
 
 ### Tests
-- [ ] Integration test path for successful AI call (mocked for CI).
-- [ ] Manual/local smoke test using prompt `2+2`.
-- [ ] Tests for missing/invalid API key behavior.
+- [x] Integration test path for successful AI call (mocked for CI).
+- [x] Manual/local smoke test using prompt `2+2`.
+- [x] Tests for missing/invalid API key behavior.
 
 ### Success Criteria
 - Backend can complete a basic OpenRouter request in local environment.
@@ -154,17 +154,17 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 ## Part 9: Structured AI Responses With Board Context
 
 ### Tasks
-- [ ] Define structured response schema in backend:
-  - [ ] `assistant_message` (required string).
-  - [ ] `board_update` (optional full board JSON patch/replacement).
-- [ ] Send current board JSON + user message + conversation history to AI.
-- [ ] Validate AI output against schema before applying.
-- [ ] Persist accepted board updates through existing backend path.
+- [x] Define structured response schema in backend:
+  - [x] `assistant_message` (required string).
+  - [x] `board_update` (optional full board JSON patch/replacement).
+- [x] Send current board JSON + user message + conversation history to AI.
+- [x] Validate AI output against schema before applying.
+- [x] Persist accepted board updates through existing backend path.
 
 ### Tests
-- [ ] Unit tests for schema validation and parsing.
-- [ ] Tests for valid update, no update, and invalid output fallback.
-- [ ] Integration tests ensuring data consistency after AI-assisted updates.
+- [x] Unit tests for schema validation and parsing.
+- [x] Tests for valid update, no update, and invalid output fallback.
+- [x] Integration tests ensuring data consistency after AI-assisted updates.
 
 ### Success Criteria
 - AI responses are machine-parseable and safe to apply.
@@ -173,15 +173,15 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 ## Part 10: AI Sidebar UX
 
 ### Tasks
-- [ ] Add sidebar chat widget in frontend UI.
-- [ ] Show conversation history and submit user prompts.
-- [ ] Call backend AI endpoint and render assistant responses.
-- [ ] Apply board updates returned by AI and refresh board state immediately.
-- [ ] Preserve clean, minimal visual design aligned with project color scheme.
+- [x] Add sidebar chat widget in frontend UI.
+- [x] Show conversation history and submit user prompts.
+- [x] Call backend AI endpoint and render assistant responses.
+- [x] Apply board updates returned by AI and refresh board state immediately.
+- [x] Preserve clean, minimal visual design aligned with project color scheme.
 
 ### Tests
-- [ ] Component tests for chat widget interactions.
-- [ ] Integration tests for AI request lifecycle (loading, success, error).
+- [x] Component tests for chat widget interactions.
+- [x] Integration tests for AI request lifecycle (loading, success, error).
 - [ ] e2e test covering: ask AI -> receives response -> board updates when provided.
 
 ### Success Criteria
