@@ -82,16 +82,16 @@ This document is the execution checklist for the MVP. Work proceeds in order. Ea
 ## Part 5: Database Modeling (SQLite + JSON Board Storage)
 
 ### Tasks
-- [ ] Document schema choice in `docs/` before implementation details expand.
-- [ ] Implement SQLite schema with one board record per user.
-- [ ] Store board state as JSON text/blob for MVP simplicity.
-- [ ] Include fields needed for future multi-user support.
-- [ ] Add migration/init logic so DB and tables are created if missing.
+- [x] Document schema choice in `docs/` before implementation details expand.
+- [x] Implement SQLite schema with one board record per user.
+- [x] Store board state as JSON text/blob for MVP simplicity.
+- [x] Include fields needed for future multi-user support.
+- [x] Add migration/init logic so DB and tables are created if missing.
 
 ### Tests
-- [ ] Unit tests for DB initialization and schema creation.
-- [ ] Unit tests for save/load board JSON round trips.
-- [ ] Tests for behavior when DB file does not exist.
+- [x] Unit tests for DB initialization and schema creation.
+- [x] Unit tests for save/load board JSON round trips.
+- [x] Tests for behavior when DB file does not exist.
 
 ### Success Criteria
 - Schema supports current MVP and future multi-user extension.

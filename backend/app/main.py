@@ -67,6 +67,7 @@ def create_app(frontend_dist: Path | None = None) -> FastAPI:
     def do_login(request: Request, username: str = Form(...), password: str = Form(...)) -> Response:
         if username == "user" and password == "password":
             request.session["authed"] = True
+            request.session["username"] = username
             return RedirectResponse(url="/", status_code=302)
 
         return render_login_page("Invalid username/password", status_code=401)

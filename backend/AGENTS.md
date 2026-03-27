@@ -22,7 +22,9 @@
 ## Directory Layout
 
 - `app/main.py`: FastAPI app and scaffold routes.
+- `app/db.py`: SQLite JSON board persistence helpers.
 - `tests/test_main.py`: Route tests using `TestClient`.
+- `tests/test_db.py`: Unit tests for DB init + JSON round trip.
 - `pyproject.toml`: Dependencies and project metadata.
 - `uv.lock`: Locked Python dependencies for reproducible setup.
 
