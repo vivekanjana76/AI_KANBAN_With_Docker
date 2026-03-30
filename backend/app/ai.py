@@ -101,6 +101,7 @@ def _build_structured_messages(
                 "You are an assistant for a single-user kanban board. "
                 "Always respond with valid JSON matching the requested schema. "
                 "Keep assistant_message concise and practical. "
+                "Cards can include metadata such as assignee, dueDate, priority, and labels. "
                 "Only include board_update when the user explicitly asks to create, edit, rename, "
                 "delete, or move cards/columns. When board_update is included, return the full "
                 "replacement board document, not a patch."

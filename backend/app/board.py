@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -16,41 +17,73 @@ DEFAULT_BOARD = {
             "id": "card-1",
             "title": "Align roadmap themes",
             "details": "Draft quarterly themes with impact statements and metrics.",
+            "assignee": "Avery",
+            "dueDate": "2026-04-03",
+            "priority": "high",
+            "labels": ["Planning", "Roadmap"],
         },
         "card-2": {
             "id": "card-2",
             "title": "Gather customer signals",
             "details": "Review support tags, sales notes, and churn feedback.",
+            "assignee": "Mina",
+            "dueDate": "2026-04-08",
+            "priority": "medium",
+            "labels": ["Research"],
         },
         "card-3": {
             "id": "card-3",
             "title": "Prototype analytics view",
             "details": "Sketch initial dashboard layout and key drill-downs.",
+            "assignee": "Jon",
+            "dueDate": "2026-04-10",
+            "priority": "medium",
+            "labels": ["Design", "Prototype"],
         },
         "card-4": {
             "id": "card-4",
             "title": "Refine status language",
             "details": "Standardize column labels and tone across the board.",
+            "assignee": "Avery",
+            "dueDate": "",
+            "priority": "low",
+            "labels": ["UX"],
         },
         "card-5": {
             "id": "card-5",
             "title": "Design card layout",
             "details": "Add hierarchy and spacing for scanning dense lists.",
+            "assignee": "Mina",
+            "dueDate": "2026-04-05",
+            "priority": "high",
+            "labels": ["Design"],
         },
         "card-6": {
             "id": "card-6",
             "title": "QA micro-interactions",
             "details": "Verify hover, focus, and loading states.",
+            "assignee": "Jon",
+            "dueDate": "2026-04-02",
+            "priority": "high",
+            "labels": ["QA"],
         },
         "card-7": {
             "id": "card-7",
             "title": "Ship marketing page",
             "details": "Final copy approved and asset pack delivered.",
+            "assignee": "Mina",
+            "dueDate": "",
+            "priority": "medium",
+            "labels": ["Launch"],
         },
         "card-8": {
             "id": "card-8",
             "title": "Close onboarding sprint",
             "details": "Document release notes and share internally.",
+            "assignee": "Avery",
+            "dueDate": "2026-04-01",
+            "priority": "medium",
+            "labels": ["Ops"],
         },
     },
 }
@@ -62,6 +95,10 @@ class CardPayload(BaseModel):
     id: str = Field(min_length=1)
     title: str
     details: str
+    assignee: str = ""
+    dueDate: str = ""
+    priority: Literal["low", "medium", "high"] = "medium"
+    labels: list[str] = Field(default_factory=list)
 
 
 class ColumnPayload(BaseModel):

@@ -19,10 +19,18 @@ import {
   sendAiMessage,
   type ChatHistoryMessage,
 } from "@/lib/api";
-import { createId, moveCard, type BoardData } from "@/lib/kanban";
+import { createId, moveCard, type BoardData, type CardPriority } from "@/lib/kanban";
 
 type LoadState = "loading" | "ready" | "error";
 type SaveState = "idle" | "saving" | "saved" | "error";
+type CardFormValues = {
+  title: string;
+  details: string;
+  assignee: string;
+  dueDate: string;
+  priority: CardPriority;
+  labels: string[];
+};
 
 export const KanbanBoard = () => {
   const [board, setBoard] = useState<BoardData | null>(null);
@@ -148,7 +156,7 @@ export const KanbanBoard = () => {
     }));
   };
 
-  const handleAddCard = (columnId: string, title: string, details: string) => {
+  const handleAddCard = (columnId: string, values: CardFormValues) => {
     if (!board) {
       return;
     }
@@ -158,7 +166,15 @@ export const KanbanBoard = () => {
       ...prev,
       cards: {
         ...prev.cards,
-        [id]: { id, title, details: details || "No details yet." },
+        [id]: {
+          id,
+          title: values.title,
+          details: values.details || "No details yet.",
+          assignee: values.assignee,
+          dueDate: values.dueDate,
+          priority: values.priority,
+          labels: values.labels,
+        },
       },
       columns: prev.columns.map((column) =>
         column.id === columnId
@@ -189,7 +205,7 @@ export const KanbanBoard = () => {
     }));
   };
 
-  const handleUpdateCard = (cardId: string, title: string, details: string) => {
+  const handleUpdateCard = (cardId: string, values: CardFormValues) => {
     if (!board) {
       return;
     }
@@ -200,8 +216,12 @@ export const KanbanBoard = () => {
         ...prev.cards,
         [cardId]: {
           ...prev.cards[cardId],
-          title,
-          details: details || "No details yet.",
+          title: values.title,
+          details: values.details || "No details yet.",
+          assignee: values.assignee,
+          dueDate: values.dueDate,
+          priority: values.priority,
+          labels: values.labels,
         },
       },
     }));

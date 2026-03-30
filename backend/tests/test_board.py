@@ -32,6 +32,26 @@ def test_board_payload_rejects_missing_card_reference() -> None:
         raise AssertionError("Expected board validation to fail")
 
 
+def test_board_payload_accepts_legacy_cards_without_metadata() -> None:
+    board = {
+        "columns": [{"id": "col-backlog", "title": "Backlog", "cardIds": ["card-1"]}],
+        "cards": {
+            "card-1": {
+                "id": "card-1",
+                "title": "Legacy card",
+                "details": "Stored before metadata existed.",
+            }
+        },
+    }
+
+    payload = BoardPayload.model_validate(board)
+
+    assert payload.cards["card-1"].assignee == ""
+    assert payload.cards["card-1"].dueDate == ""
+    assert payload.cards["card-1"].priority == "medium"
+    assert payload.cards["card-1"].labels == []
+
+
 def test_load_or_create_board_persists_default_board(tmp_path: Path, monkeypatch) -> None:
     db_path = tmp_path / "pm.sqlite3"
     monkeypatch.setattr(db_module, "DEFAULT_DB_PATH", db_path)

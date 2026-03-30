@@ -148,14 +148,28 @@ def test_api_board_replaces_board(tmp_path: Path) -> None:
             "card-1": {"id": "card-1", "title": "Updated", "details": "Persist me."}
         },
     }
+    expected_board = {
+        "columns": [{"id": "col-backlog", "title": "Custom", "cardIds": ["card-1"]}],
+        "cards": {
+            "card-1": {
+                "id": "card-1",
+                "title": "Updated",
+                "details": "Persist me.",
+                "assignee": "",
+                "dueDate": "",
+                "priority": "medium",
+                "labels": [],
+            }
+        },
+    }
     response = client.put("/api/board", json=board)
 
     assert response.status_code == 200
-    assert response.json() == {"board": board}
+    assert response.json() == {"board": expected_board}
 
     saved = client.get("/api/board")
     assert saved.status_code == 200
-    assert saved.json() == {"board": board}
+    assert saved.json() == {"board": expected_board}
 
 
 def test_api_board_rejects_invalid_payload(tmp_path: Path) -> None:

@@ -45,16 +45,29 @@ test("edits a card and keeps the changes after reload", async ({ page }) => {
   await card.getByRole("button", { name: /edit align roadmap themes/i }).click();
   await card.getByLabel("Card title").fill("Edited by Playwright");
   await card.getByLabel("Card details").fill("Updated from the browser test.");
+  await card.getByLabel("Card assignee").fill("Riley");
+  await card.getByLabel("Card due date").fill("2026-04-15");
+  await card.getByLabel("Card priority").selectOption("low");
+  await card.getByLabel("Card labels").fill("Planning, Browser");
   await card.getByRole("button", { name: /save/i }).click();
 
   await expect(card.getByText("Edited by Playwright")).toBeVisible();
   await expect(card.getByText("Updated from the browser test.")).toBeVisible();
+  await expect(card.getByText("Riley")).toBeVisible();
+  await expect(card.getByText("Due 2026-04-15")).toBeVisible();
+  await expect(card.getByText("low")).toBeVisible();
+  await expect(card.getByText("Planning")).toBeVisible();
+  await expect(card.getByText("Browser")).toBeVisible();
   await expect(page.getByText("All changes saved")).toBeVisible();
 
   await page.reload();
   const reloadedCard = page.getByTestId("card-card-1");
   await expect(reloadedCard.getByText("Edited by Playwright")).toBeVisible();
   await expect(reloadedCard.getByText("Updated from the browser test.")).toBeVisible();
+  await expect(reloadedCard.getByText("Riley")).toBeVisible();
+  await expect(reloadedCard.getByText("Due 2026-04-15")).toBeVisible();
+  await expect(reloadedCard.getByText("Planning")).toBeVisible();
+  await expect(reloadedCard.getByText("Browser")).toBeVisible();
 });
 
 test("moves a card between columns and keeps it after reload", async ({ page }) => {

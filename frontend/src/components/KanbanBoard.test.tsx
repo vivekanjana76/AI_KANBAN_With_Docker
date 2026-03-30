@@ -143,18 +143,36 @@ describe("KanbanBoard", () => {
     const detailsInput = within(card).getByLabelText("Card details");
     await userEvent.clear(detailsInput);
     await userEvent.type(detailsInput, "Fresh implementation notes.");
+    await userEvent.clear(within(card).getByLabelText("Card assignee"));
+    await userEvent.type(within(card).getByLabelText("Card assignee"), "Riley");
+    await userEvent.clear(within(card).getByLabelText("Card due date"));
+    await userEvent.type(within(card).getByLabelText("Card due date"), "2026-04-15");
+    await userEvent.selectOptions(
+      within(card).getByLabelText("Card priority"),
+      "low"
+    );
+    await userEvent.clear(within(card).getByLabelText("Card labels"));
+    await userEvent.type(
+      within(card).getByLabelText("Card labels"),
+      "Planning, Weekly"
+    );
 
     await userEvent.click(within(card).getByRole("button", { name: /save/i }));
 
     expect(await within(card).findByText("Updated roadmap theme")).toBeInTheDocument();
     expect(within(card).getByText("Fresh implementation notes.")).toBeInTheDocument();
+    expect(within(card).getByText("Riley")).toBeInTheDocument();
+    expect(within(card).getByText("Due 2026-04-15")).toBeInTheDocument();
+    expect(within(card).getByText("low")).toBeInTheDocument();
+    expect(within(card).getByText("Planning")).toBeInTheDocument();
+    expect(within(card).getByText("Weekly")).toBeInTheDocument();
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
         "/api/board",
         expect.objectContaining({
           method: "PUT",
-          body: expect.stringContaining('"title":"Updated roadmap theme"'),
+          body: expect.stringContaining('"assignee":"Riley"'),
         })
       );
     });
