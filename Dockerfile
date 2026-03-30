@@ -20,8 +20,9 @@ RUN pip install --no-cache-dir uv
 
 COPY backend/pyproject.toml /app/backend/pyproject.toml
 COPY backend/README.md /app/backend/README.md
+COPY backend/uv.lock /app/backend/uv.lock
 
-RUN uv sync --directory /app/backend
+RUN uv sync --directory /app/backend --frozen
 
 COPY backend /app/backend
 COPY --from=frontend-builder /frontend/out /app/frontend/out

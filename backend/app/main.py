@@ -152,7 +152,6 @@ def create_app(frontend_dist: Path | None = None) -> FastAPI:
         username = require_authenticated_username(request)
         if payload.board is not None:
             current_board = payload.board.model_dump(mode="python")
-            upsert_board(username, current_board)
         else:
             current_board = load_or_create_board(username)
 
@@ -194,7 +193,7 @@ def create_app(frontend_dist: Path | None = None) -> FastAPI:
         return FileResponse(index_file)
 
     @app.get("/{requested_path:path}")
-    def frontend_assets(requested_path: str) -> Response:
+    def frontend_assets(request: Request, requested_path: str) -> Response:
         if requested_path.startswith("api/"):
             raise HTTPException(status_code=404, detail="Not Found")
 
@@ -207,6 +206,12 @@ def create_app(frontend_dist: Path | None = None) -> FastAPI:
 
         if safe_path.exists() and safe_path.is_file():
             return FileResponse(safe_path)
+
+        if "." in Path(requested_path).name:
+            raise HTTPException(status_code=404, detail="Not Found")
+
+        if not request.session.get("authed"):
+            return RedirectResponse(url="/login", status_code=302)
 
         fallback_index = frontend_root / "index.html"
         if fallback_index.exists():

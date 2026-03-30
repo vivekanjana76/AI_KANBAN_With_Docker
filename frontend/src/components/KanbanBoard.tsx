@@ -189,6 +189,24 @@ export const KanbanBoard = () => {
     }));
   };
 
+  const handleUpdateCard = (cardId: string, title: string, details: string) => {
+    if (!board) {
+      return;
+    }
+
+    updateBoard((prev) => ({
+      ...prev,
+      cards: {
+        ...prev.cards,
+        [cardId]: {
+          ...prev.cards[cardId],
+          title,
+          details: details || "No details yet.",
+        },
+      },
+    }));
+  };
+
   const handleAiSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!board) {
@@ -348,6 +366,7 @@ export const KanbanBoard = () => {
                   cards={column.cardIds.map((cardId) => board.cards[cardId])}
                   onRename={handleRenameColumn}
                   onAddCard={handleAddCard}
+                  onUpdateCard={handleUpdateCard}
                   onDeleteCard={handleDeleteCard}
                 />
               ))}

@@ -127,6 +127,39 @@ describe("KanbanBoard", () => {
     });
   });
 
+  it("edits a card and persists the changes", async () => {
+    const fetchMock = installFetchMock();
+    render(<KanbanBoard />);
+
+    const card = await screen.findByTestId("card-card-1");
+    await userEvent.click(
+      within(card).getByRole("button", { name: /edit align roadmap themes/i })
+    );
+
+    const titleInput = within(card).getByLabelText("Card title");
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, "Updated roadmap theme");
+
+    const detailsInput = within(card).getByLabelText("Card details");
+    await userEvent.clear(detailsInput);
+    await userEvent.type(detailsInput, "Fresh implementation notes.");
+
+    await userEvent.click(within(card).getByRole("button", { name: /save/i }));
+
+    expect(await within(card).findByText("Updated roadmap theme")).toBeInTheDocument();
+    expect(within(card).getByText("Fresh implementation notes.")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/board",
+        expect.objectContaining({
+          method: "PUT",
+          body: expect.stringContaining('"title":"Updated roadmap theme"'),
+        })
+      );
+    });
+  });
+
   it("shows a load error when the API request fails", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       jsonResponse({ detail: "Backend offline" }, { status: 503 })

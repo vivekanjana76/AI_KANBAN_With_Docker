@@ -201,6 +201,64 @@ def test_ai_chat_keeps_current_board_when_no_update_returned(tmp_path: Path, mon
     assert body["board"]["columns"][0]["title"] == "Backlog"
 
 
+def test_ai_chat_does_not_persist_client_board_when_ai_returns_no_update(
+    tmp_path: Path, monkeypatch
+) -> None:
+    async def fake_ai_response(*args, **kwargs):
+        return AIModelResponse.model_validate(
+            {"assistant_message": "No board changes needed.", "board_update": None}
+        )
+
+    monkeypatch.setattr("app.main.request_openrouter_structured_response", fake_ai_response)
+    client = create_authed_client(tmp_path)
+
+    latest_board = default_board()
+    latest_board["columns"][0]["title"] = "Latest Server Title"
+    save_response = client.put("/api/board", json=latest_board)
+    assert save_response.status_code == 200
+
+    stale_board = default_board()
+    response = client.post(
+        "/api/ai/chat",
+        json={"message": "Summarize the board", "history": [], "board": stale_board},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["board"]["columns"][0]["title"] == "Backlog"
+
+    saved_board = client.get("/api/board")
+    assert saved_board.status_code == 200
+    assert saved_board.json()["board"]["columns"][0]["title"] == "Latest Server Title"
+
+
+def test_ai_chat_does_not_persist_client_board_when_ai_errors(
+    tmp_path: Path, monkeypatch
+) -> None:
+    async def fake_ai_response(*args, **kwargs):
+        raise AIServiceError("Upstream unavailable", status_code=502)
+
+    monkeypatch.setattr("app.main.request_openrouter_structured_response", fake_ai_response)
+    client = create_authed_client(tmp_path)
+
+    latest_board = default_board()
+    latest_board["columns"][0]["title"] = "Latest Server Title"
+    save_response = client.put("/api/board", json=latest_board)
+    assert save_response.status_code == 200
+
+    stale_board = default_board()
+    response = client.post(
+        "/api/ai/chat",
+        json={"message": "Summarize the board", "history": [], "board": stale_board},
+    )
+
+    assert response.status_code == 502
+    assert response.json() == {"detail": "Upstream unavailable"}
+
+    saved_board = client.get("/api/board")
+    assert saved_board.status_code == 200
+    assert saved_board.json()["board"]["columns"][0]["title"] == "Latest Server Title"
+
+
 def test_ai_chat_requires_authentication(tmp_path: Path) -> None:
     db_module.DEFAULT_DB_PATH = tmp_path / "pm.sqlite3"
     frontend_out = tmp_path / "out"

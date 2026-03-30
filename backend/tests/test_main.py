@@ -69,6 +69,30 @@ def test_root_returns_503_when_frontend_missing(tmp_path: Path) -> None:
     assert response.json()["error"] == "frontend build missing"
 
 
+def test_unknown_frontend_path_redirects_to_login_when_unauthenticated(tmp_path: Path) -> None:
+    client = create_client(tmp_path)
+
+    response = client.get("/anything", follow_redirects=False)
+
+    assert response.status_code in (302, 307)
+    assert response.headers["location"] == "/login"
+
+
+def test_missing_frontend_asset_returns_404(tmp_path: Path) -> None:
+    client = create_client(tmp_path)
+    login_resp = client.post(
+        "/api/login",
+        data={"username": "user", "password": "password"},
+        follow_redirects=False,
+    )
+    assert login_resp.status_code in (302, 307)
+
+    response = client.get("/missing.js", follow_redirects=False)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Not Found"}
+
+
 def test_login_rejects_invalid_credentials(tmp_path: Path) -> None:
     client = create_client(tmp_path)
 
